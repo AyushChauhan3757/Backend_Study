@@ -7,10 +7,15 @@
         try {
             require_once "dbh.inc.php";
 
-            $query = "INSERT INTO users (username, pwd, email) VALUES (?, ?, ?);";
+            $query = "INSERT INTO users (username, pwd, email) VALUES (:username, :pwd, :email);";
 
             $stmt = $pdo->prepare($query);
-            $stmt->execute([$username, $password, $email]);
+
+            $stmt->bindParam(":username", $username);
+            $stmt->bindParam(":pwd", $password);
+            $stmt->bindParam(":email", $email);
+            
+            $stmt->execute();
 
             $pdo = null;
             $stmt = null;
