@@ -4,6 +4,18 @@ $dir = '.';
 
 // Open the directory
 if ($handle = opendir($dir)) {
+    // Store the entries in an array
+    $entries = [];
+    while (false !== ($entry = readdir($handle))) {
+        // Skip the current and parent directory entries
+        if ($entry != "." && $entry != "..") {
+            $entries[] = $entry;
+        }
+    }
+
+    // Sort the entries in alphabetical order
+    sort($entries);
+
     echo "<!DOCTYPE html>
     <html lang='en'>
     <head>
@@ -57,33 +69,30 @@ if ($handle = opendir($dir)) {
                 <th>Last Modified</th>
             </tr>";
 
-    // Loop through the directory
-    while (false !== ($entry = readdir($handle))) {
-        // Skip the current and parent directory entries
-        if ($entry != "." && $entry != "..") {
-            // Check if the entry is a directory
-            if (is_dir($entry)) {
-                echo "<tr>
-                        <td class='directory'><a href=\"$entry/index.php\">$entry</a></td>
-                        <td class='directory'>-</td>
-                        <td class='directory'>" . date("F d Y H:i:s", filemtime($entry)) . "</td>
-                      </tr>";
-            } else {
-                $fileSize = filesize($entry);
-                $lastModified = date("F d Y H:i:s", filemtime($entry));
-                echo "<tr>
-                        <td class='file'><a href=\"$entry\">$entry</a></td>
-                        <td class='file'>" . formatSize($fileSize) . "</td>
-                        <td class='file'>$lastModified</td>
-                      </tr>";
-            }
+    // Loop through the sorted entries
+    foreach ($entries as $entry) {
+        // Check if the entry is a directory
+        if (is_dir($entry)) {
+            echo "<tr>
+                    <td class='directory'><a href=\"$entry/index.php\">$entry</a></td>
+                    <td class='directory'>-</td>
+                    <td class='directory'>" . date("F d Y H:i:s", filemtime($entry)) . "</td>
+                  </tr>";
+        } else {
+            $fileSize = filesize($entry);
+            $lastModified = date("F d Y H:i:s", filemtime($entry));
+            echo "<tr>
+                    <td class='file'><a href=\"$entry\">$entry</a></td>
+                    <td class='file'>" . formatSize($fileSize) . "</td>
+                    <td class='file'>$lastModified</td>
+                  </tr>";
         }
     }
 
     echo "</table>
         </body>
     </html>";
-    
+
     closedir($handle);
 } else {
     echo "Could not open directory.";
